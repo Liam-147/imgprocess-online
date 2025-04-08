@@ -37,7 +37,24 @@ const resources = {
       'supported-formats': '支持JPG、PNG、WEBP、GIF等格式',
       'output-format': '输出格式',
       'image-list': '图片列表',
-      'back-to-home': '返回首页'
+      'back-to-home': '返回首页',
+      'format-conversion-description': '支持JPG、PNG、WEBP等格式互转，可调整质量参数',
+      'image-split-description': '将一张图片分割成多个部分，支持自定义网格分割',
+      'image-merge-description': '多张图片智能拼接，支持水平和垂直拼接模式',
+      'watermark-removal-description': '智能识别并去除图片中的水印，保持原图质量',
+      'background-change-description': '智能分离前景，轻松替换图片背景',
+      'text-to-image-description': '通过文字描述生成图像，支持多种风格',
+      'image-repair-description': '智能修复图片瑕疵，优化老照片，去除不需要的元素',
+      'coming-soon': '敬请期待',
+      'app-title': '专业图片处理平台',
+      'app-subtitle': '一站式解决您的图片处理需求',
+      'fast-processing-desc': '通过高效算法，快速处理您的图片需求',
+      'security-desc': '您的图片不会被存储，保障隐私安全',
+      'ai-powered-desc': '先进的AI技术，提供智能图片处理体验',
+      'free-online-convert': '免费在线转换您的图像',
+      'quality-desc': '轻松将图像文件转换为所需的格式，而不会造成任何质量损失',
+      'drop-files': '放开以上传图片...',
+      'conversion-settings': '转换设置'
     }
   },
   en: {
@@ -72,7 +89,24 @@ const resources = {
       'supported-formats': 'Supports JPG, PNG, WEBP, GIF, etc.',
       'output-format': 'Output Format',
       'image-list': 'Image List',
-      'back-to-home': 'Back to Home'
+      'back-to-home': 'Back to Home',
+      'format-conversion-description': 'Convert between JPG, PNG, WEBP, and other formats with quality parameters',
+      'image-split-description': 'Split an image into multiple parts, with custom grid options',
+      'image-merge-description': 'Smart image merging with horizontal and vertical modes',
+      'watermark-removal-description': 'Intelligently detect and remove watermarks while keeping quality',
+      'background-change-description': 'Intelligently separate foreground and easily change backgrounds',
+      'text-to-image-description': 'Generate images from text descriptions with various styles',
+      'image-repair-description': 'Smart image repair, old photo enhancement, and unwanted element removal',
+      'coming-soon': 'Coming Soon',
+      'app-title': 'Professional Image Processing Platform',
+      'app-subtitle': 'One-stop solution for all your image processing needs',
+      'fast-processing-desc': 'Process your images quickly with efficient algorithms',
+      'security-desc': 'Your images are not stored, ensuring privacy and security',
+      'ai-powered-desc': 'Advanced AI technology for intelligent image processing',
+      'free-online-convert': 'Convert your images online for free',
+      'quality-desc': 'Easily convert image files to your desired format without any quality loss',
+      'drop-files': 'Drop to upload images...',
+      'conversion-settings': 'Conversion Settings'
     }
   },
   ja: {

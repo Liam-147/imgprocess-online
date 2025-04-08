@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Link from 'next/link';
+import JSZip from 'jszip';
+import { useTranslation } from 'react-i18next';
 
 const supportedFormats = [
   { value: 'jpeg', label: 'JPEG' },
@@ -21,6 +23,7 @@ interface ImageFile {
 }
 
 export default function FormatConversion() {
+  const { t } = useTranslation();
   const [files, setFiles] = useState<ImageFile[]>([]);
   const [outputFormat, setOutputFormat] = useState('jpeg');
   const [isConverting, setIsConverting] = useState(false);
@@ -144,6 +147,32 @@ export default function FormatConversion() {
     });
   };
 
+  const handleZipDownload = async () => {
+    if (files.length === 0 || !files.some(f => f.convertedUrl)) return;
+
+    const zip = new JSZip();
+    const convertedFiles = files.filter(file => file.convertedUrl && file.convertedFormat);
+
+    for (const file of convertedFiles) {
+      if (!file.convertedUrl) continue;
+      const response = await fetch(file.convertedUrl);
+      const blob = await response.blob();
+      const originalFileName = file.file.name;
+      const fileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) || originalFileName;
+      zip.file(`${fileName}.${file.convertedFormat}`, blob);
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'converted_images.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-4">
@@ -151,14 +180,14 @@ export default function FormatConversion() {
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          返回首页
+          {t('back-to-home')}
         </Link>
       </div>
     
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-4">图片格式转换</h1>
-        <p className="text-xl mb-2">免费在线转换您的图像</p>
-        <p className="text-gray-300">轻松将图像文件转换为所需的格式，而不会造成任何质量损失</p>
+        <h1 className="text-3xl font-bold mb-4">{t('format-conversion')}</h1>
+        <p className="text-xl mb-2">{t('free-online-convert')}</p>
+        <p className="text-gray-300">{t('quality-desc')}</p>
       </div>
       
       <div className="max-w-2xl mx-auto mb-8">
@@ -168,19 +197,19 @@ export default function FormatConversion() {
         >
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p className="text-xl">放开以上传图片...</p>
+            <p className="text-xl">{t('drop-files')}</p>
           ) : (
             <div className="text-center">
-              <p className="text-xl mb-2">拖放图片到这里，或点击选择文件</p>
-              <p className="text-sm text-gray-300">支持JPG、PNG、WEBP、GIF等格式</p>
+              <p className="text-xl mb-2">{t('drag-drop')}</p>
+              <p className="text-sm text-gray-300">{t('supported-formats')}</p>
             </div>
           )}
         </div>
 
         <div className="bg-deep-blue p-4 rounded-md mb-4">
-          <h2 className="text-xl font-bold mb-4 text-center">转换设置</h2>
+          <h2 className="text-xl font-bold mb-4 text-center">{t('conversion-settings')}</h2>
           <div className="mb-4">
-            <label htmlFor="format-select" className="block mb-2 text-center">输出格式:</label>
+            <label htmlFor="format-select" className="block mb-2 text-center">{t('output-format')}:</label>
             <select
               id="format-select"
               value={outputFormat}
@@ -207,18 +236,29 @@ export default function FormatConversion() {
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {isConverting ? '转换中...' : '开始转换'}
+            {isConverting ? t('converting') : t('convert')}
           </button>
           <button
             onClick={handleBatchDownload}
             disabled={files.length === 0 || !files.some(f => f.convertedUrl)}
-            className={`py-2 px-6 rounded-md font-bold ${
+            className={`py-2 px-6 rounded-md font-bold text-white ${
               files.length === 0 || !files.some(f => f.convertedUrl)
                 ? 'bg-gray-500 cursor-not-allowed'
                 : 'bg-green-600 hover:bg-green-700'
             }`}
           >
-            批量下载
+            {t('batch-download')}
+          </button>
+          <button
+            onClick={handleZipDownload}
+            disabled={files.length === 0 || !files.some(f => f.convertedUrl)}
+            className={`py-2 px-6 rounded-md font-bold text-white ${
+              files.length === 0 || !files.some(f => f.convertedUrl)
+                ? 'bg-gray-500 cursor-not-allowed'
+                : 'bg-purple-600 hover:bg-purple-700'
+            }`}
+          >
+            {t('zip-download')}
           </button>
           <button
             onClick={() => setFiles([])}
@@ -229,23 +269,23 @@ export default function FormatConversion() {
                 : 'bg-red-600 hover:bg-red-700'
             }`}
           >
-            批量删除
+            {t('batch-delete')}
           </button>
         </div>
       </div>
 
       {files.length > 0 && (
         <div className="bg-deep-blue p-4 rounded-md">
-          <h2 className="text-xl font-bold mb-4 text-center">图片列表</h2>
+          <h2 className="text-xl font-bold mb-4 text-center">{t('image-list')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="p-2 text-left">预览</th>
-                  <th className="p-2 text-left">文件名</th>
-                  <th className="p-2 text-left">大小</th>
-                  <th className="p-2 text-left">转换格式</th>
-                  <th className="p-2 text-left">操作</th>
+                  <th className="p-2 text-left">{t('preview')}</th>
+                  <th className="p-2 text-left">{t('filename')}</th>
+                  <th className="p-2 text-left">{t('size')}</th>
+                  <th className="p-2 text-left">{t('format')}</th>
+                  <th className="p-2 text-left">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -254,7 +294,7 @@ export default function FormatConversion() {
                     <td className="p-2">
                       <img 
                         src={file.preview} 
-                        alt="预览"
+                        alt={t('preview')}
                         className="w-16 h-16 object-cover rounded"
                       />
                     </td>
@@ -268,14 +308,14 @@ export default function FormatConversion() {
                             onClick={() => handleDownload(file)}
                             className="bg-green-600 hover:bg-green-700 py-1 px-3 rounded-md text-sm"
                           >
-                            下载
+                            {t('download')}
                           </button>
                         )}
                         <button
                           onClick={() => handleDelete(file.id)}
                           className="bg-red-600 hover:bg-red-700 py-1 px-3 rounded-md text-sm"
                         >
-                          删除
+                          {t('delete')}
                         </button>
                       </div>
                     </td>
