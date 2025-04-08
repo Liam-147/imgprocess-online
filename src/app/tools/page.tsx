@@ -20,7 +20,7 @@ const features = [
     description: '将一张图片分割成多个部分，支持自定义网格分割',
     icon: '✂️',
     path: '/tools/image-split',
-    available: false,
+    available: true,
   },
   {
     id: 'image-merge',

@@ -15,7 +15,7 @@ const features = [
     id: 'image-split',
     icon: '✂️',
     path: '/tools/image-split',
-    available: false,
+    available: true,
   },
   {
     id: 'image-merge',
