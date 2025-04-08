@@ -3,8 +3,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Link from 'next/link';
-import JSZip from 'jszip';
-import { useTranslation } from 'react-i18next';
 
 const supportedFormats = [
   { value: 'jpeg', label: 'JPEG' },
@@ -12,8 +10,6 @@ const supportedFormats = [
   { value: 'webp', label: 'WEBP' },
   { value: 'gif', label: 'GIF' },
   { value: 'bmp', label: 'BMP' },
-  { value: 'tiff', label: 'TIFF' },
-  { value: 'heic', label: 'HEIC' }
 ];
 
 interface ImageFile {
@@ -25,7 +21,6 @@ interface ImageFile {
 }
 
 export default function FormatConversion() {
-  const { t } = useTranslation();
   const [files, setFiles] = useState<ImageFile[]>([]);
   const [outputFormat, setOutputFormat] = useState('jpeg');
   const [isConverting, setIsConverting] = useState(false);
@@ -78,8 +73,6 @@ export default function FormatConversion() {
               case 'webp': mimeType = 'image/webp'; break;
               case 'bmp': mimeType = 'image/bmp'; break;
               case 'gif': mimeType = 'image/gif'; break;
-              case 'tiff': mimeType = 'image/tiff'; break;
-              case 'heic': mimeType = 'image/heic'; break;
             }
             
             const dataUrl = canvas.toDataURL(mimeType);
@@ -151,31 +144,6 @@ export default function FormatConversion() {
     });
   };
 
-  const handleZipDownload = async () => {
-    const zip = new JSZip();
-    
-    // 添加所有已转换的图片到zip文件
-    for (const file of files) {
-      if (file.convertedUrl) {
-        // 从dataURL中提取base64数据
-        const base64Data = file.convertedUrl.split(',')[1];
-        const fileName = `${file.file.name.split('.')[0]}.${file.convertedFormat}`;
-        zip.file(fileName, base64Data, { base64: true });
-      }
-    }
-
-    // 生成并下载zip文件
-    const content = await zip.generateAsync({ type: 'blob' });
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'converted_images.zip';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-4">
@@ -183,14 +151,14 @@ export default function FormatConversion() {
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          {t('back-to-home')}
+          返回首页
         </Link>
       </div>
     
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-4">{t('format-conversion')}</h1>
-        <p className="text-xl mb-2">{t('drag-drop')}</p>
-        <p className="text-gray-300">{t('supported-formats')}</p>
+        <h1 className="text-3xl font-bold mb-4">图片格式转换</h1>
+        <p className="text-xl mb-2">免费在线转换您的图像</p>
+        <p className="text-gray-300">轻松将图像文件转换为所需的格式，而不会造成任何质量损失</p>
       </div>
       
       <div className="max-w-2xl mx-auto mb-8">
@@ -200,25 +168,25 @@ export default function FormatConversion() {
         >
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p className="text-xl">{t('drag-drop')}</p>
+            <p className="text-xl">放开以上传图片...</p>
           ) : (
             <div className="text-center">
-              <p className="text-xl mb-2">{t('drag-drop')}</p>
-              <p className="text-sm text-gray-300">{t('supported-formats')}</p>
+              <p className="text-xl mb-2">拖放图片到这里，或点击选择文件</p>
+              <p className="text-sm text-gray-300">支持JPG、PNG、WEBP、GIF等格式</p>
             </div>
           )}
         </div>
 
         <div className="bg-deep-blue p-4 rounded-md mb-4">
-          <h2 className="text-xl font-bold mb-4 text-center">{t('output-format')}</h2>
+          <h2 className="text-xl font-bold mb-4 text-center">转换设置</h2>
           <div className="mb-4">
-            <label htmlFor="format-select" className="block mb-2 text-center">{t('output-format')}:</label>
+            <label htmlFor="format-select" className="block mb-2 text-center">输出格式:</label>
             <select
               id="format-select"
               value={outputFormat}
               onChange={(e) => setOutputFormat(e.target.value)}
               className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-              title={t('output-format')}
+              title="选择输出格式"
             >
               {supportedFormats.map((format) => (
                 <option key={format.value} value={format.value}>
@@ -239,7 +207,7 @@ export default function FormatConversion() {
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {isConverting ? t('converting') : t('convert')}
+            {isConverting ? '转换中...' : '开始转换'}
           </button>
           <button
             onClick={handleBatchDownload}
@@ -250,18 +218,7 @@ export default function FormatConversion() {
                 : 'bg-green-600 hover:bg-green-700'
             }`}
           >
-            {t('batch-download')}
-          </button>
-          <button
-            onClick={handleZipDownload}
-            disabled={files.length === 0 || !files.some(f => f.convertedUrl)}
-            className={`py-2 px-6 rounded-md font-bold ${
-              files.length === 0 || !files.some(f => f.convertedUrl)
-                ? 'bg-gray-500 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700'
-            }`}
-          >
-            {t('zip-download')}
+            批量下载
           </button>
           <button
             onClick={() => setFiles([])}
@@ -272,49 +229,53 @@ export default function FormatConversion() {
                 : 'bg-red-600 hover:bg-red-700'
             }`}
           >
-            {t('batch-delete')}
+            批量删除
           </button>
         </div>
       </div>
 
       {files.length > 0 && (
         <div className="bg-deep-blue p-4 rounded-md">
-          <h2 className="text-xl font-bold mb-4 text-center">{t('image-list')}</h2>
+          <h2 className="text-xl font-bold mb-4 text-center">图片列表</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="p-2 text-left">{t('preview')}</th>
-                  <th className="p-2 text-left">{t('filename')}</th>
-                  <th className="p-2 text-left">{t('size')}</th>
-                  <th className="p-2 text-left">{t('format')}</th>
-                  <th className="p-2 text-left">{t('actions')}</th>
+                  <th className="p-2 text-left">预览</th>
+                  <th className="p-2 text-left">文件名</th>
+                  <th className="p-2 text-left">大小</th>
+                  <th className="p-2 text-left">转换格式</th>
+                  <th className="p-2 text-left">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {files.map((file) => (
                   <tr key={file.id} className="border-b border-gray-700">
                     <td className="p-2">
-                      <img src={file.preview} alt={file.file.name} className="w-16 h-16 object-cover" />
+                      <img 
+                        src={file.preview} 
+                        alt="预览"
+                        className="w-16 h-16 object-cover rounded"
+                      />
                     </td>
                     <td className="p-2">{file.file.name}</td>
-                    <td className="p-2">{(file.file.size / 1024).toFixed(2)} KB</td>
-                    <td className="p-2">{file.convertedFormat || file.file.type.split('/')[1]}</td>
+                    <td className="p-2">{(file.file.size / 1024 / 1024).toFixed(2)} MB</td>
+                    <td className="p-2">{file.convertedFormat || '-'}</td>
                     <td className="p-2">
-                      <div className="flex space-x-2">
+                      <div className="flex gap-2">
                         {file.convertedUrl && (
                           <button
                             onClick={() => handleDownload(file)}
-                            className="text-blue-400 hover:text-blue-300"
+                            className="bg-green-600 hover:bg-green-700 py-1 px-3 rounded-md text-sm"
                           >
-                            {t('download')}
+                            下载
                           </button>
                         )}
                         <button
                           onClick={() => handleDelete(file.id)}
-                          className="text-red-400 hover:text-red-300"
+                          className="bg-red-600 hover:bg-red-700 py-1 px-3 rounded-md text-sm"
                         >
-                          {t('delete')}
+                          删除
                         </button>
                       </div>
                     </td>

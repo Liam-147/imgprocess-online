@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import I18nProvider from '@/components/I18nProvider';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="zh">
       <body className={inter.className}>
         <I18nProvider>
+          <GoogleAnalytics />
           <div className="min-h-screen bg-dark-bg text-white">
             <header className="container mx-auto py-4 px-4 flex justify-between items-center">
               <h1 className="text-2xl font-bold">ImgProcess.online</h1>
